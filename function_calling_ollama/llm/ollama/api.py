@@ -11,7 +11,7 @@ import requests
 OLLAMA_CHAT_API_BASE_URL = "/api/chat"
 OLLAMA_COMPLETION_API_BASE_URL = "/api/generate"
 
-class LocalChatModelConfig(BaseModel):
+class LocalModelConfig(BaseModel):
     endpoint:str
     modelname:str
     system:Message
@@ -19,30 +19,32 @@ class LocalChatModelConfig(BaseModel):
 
 console = Console()
 
-class LocalOllamaModel:
+class LocalModel:
 
-    def __init__(self,config:LocalChatModelConfig) -> None:
-        self._config:LocalChatModelConfig = config
+    def __init__(self,config:LocalModelConfig) -> None:
+        self._config:LocalModelConfig = config
         self.endpoint = self._config.endpoint
         if not self.endpoint.startswith(("http://", "https://")):
             raise ValueError(f"Provided OPENAI_API_BASE value ({self.endpoint}) must begin with http:// or https://")
 
     def query(self,prompt:str,format="txt"):
-        request = {
+        payload = {
             "model":self._config.modelname,
             "prompt":prompt,
             "stream":False,
             "options":{
                 "num_ctx":self._config.context_window
-            }
+            },
+            "raw":False,
         }
         if(format=="json"):
-            request = request.update({
+            payload = payload.update({
                 "format":"json"
             })
+        console.print(payload)
         try:
             uri = urljoin(self.endpoint.strip("/") + "/" ,OLLAMA_COMPLETION_API_BASE_URL.strip("/"))
-            response = requests.post(uri, json=request)
+            response = requests.post(uri, json=payload)
             print(response)
             print(response.status_code)
             if response.status_code == 200:
@@ -79,14 +81,14 @@ class LocalOllamaModel:
 
 
 if __name__ == "__main__":
-    llama3_config =  LocalChatModelConfig(
+    llama3_config =  LocalModel(
         endpoint="http://localhost:11434/",
         modelname="llama3",
         system=Message(role="system",content="you are very help assistant\nASSISTANT:"),
         context_window=2048
     )
 
-    local_model = LocalOllamaModel(llama3_config)
+    local_model = LocalModel(llama3_config)
     local_model.query("why the sky is blue")
 
 
