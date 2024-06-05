@@ -32,6 +32,9 @@ class LocalOllamaModel:
             "model":self._config.modelname,
             "prompt":prompt,
             "stream":False,
+            "options":{
+                "num_ctx":self._config.context_window
+            }
         }
         if(format=="json"):
             request = request.update({
@@ -80,7 +83,7 @@ if __name__ == "__main__":
         endpoint="http://localhost:11434/",
         modelname="llama3",
         system=Message(role="system",content="you are very help assistant\nASSISTANT:"),
-        context_window=8192
+        context_window=2048
     )
 
     local_model = LocalOllamaModel(llama3_config)
