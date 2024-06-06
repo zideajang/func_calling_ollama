@@ -20,9 +20,11 @@ class Direction:
 class Weather:
     pass
 
-def get_weather(city_name:str)->Weather:
+def get_weather(city_name:str)->str:
     """Get the current weather given a city"""
+    console.print(f"Fetching weather for {city_name}...")
     #TODO implement this to actually call it later
+    return f"Weather in {city_name}: Sunny with mild temperatures."
 
 
 def get_directions(start:str,destination:str)->Direction:
@@ -31,3 +33,25 @@ def get_directions(start:str,destination:str)->Direction:
     destination: end address as a string including zipcode (if any)"""
 
     #TODO implement this to actually call it later
+
+
+# TODO call tool 推广到更加通用
+def call_tool(data,func):
+
+    tool_name = data['tools']['tool']
+    tool_input = data['tools']['tool_input']
+    
+    # TODO 导入 function 所在模块
+    tool_mapping = {
+        'get_weather': get_weather,
+        'get_directions' : get_directions 
+    }
+    
+    if tool_name in tool_mapping:
+        result = tool_mapping[tool_name](**tool_input)
+        print(result)
+        if func:
+            func(result)
+        return result
+    else:
+        print("No such tool found.")

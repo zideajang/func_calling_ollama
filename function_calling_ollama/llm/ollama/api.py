@@ -74,7 +74,7 @@ class LocalModel:
             raise 
     
     def bind_tools(self,tools:List[Any]):
-        pass
+        self.tools.extend(tools)
     
     def chat(self,messages:List[Message]):
         request = {

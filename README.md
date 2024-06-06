@@ -21,3 +21,31 @@ What's the weather in shenyang
   }
 }
 ```
+
+```shell
+{
+  "tools": {
+    "tool": "get_weather",
+    "tool_input": {
+      "city_name": "shenyang"
+    }
+  }
+}
+<class 'str'>
+{'tools': {'tool': 'get_weather', 'tool_input': {'city_name': 'shenyang'}}}
+Fetching weather for shenyang...
+Weather in shenyang: Sunny with mild temperatures.
+```
+
+```
+Here's my response:
+
+{
+  "tools": {
+    "tool": "get_weather",
+    "tool_input": {
+      "city_name": "Shenyang"
+    }
+  }
+}
+```
