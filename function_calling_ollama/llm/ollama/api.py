@@ -5,6 +5,8 @@ from urllib.parse import urljoin
 
 from pydantic import BaseModel,Field
 from function_calling_ollama.message.base import Message
+from function_calling_ollama.prompt.prompt_template import FunctionCallingPromptTemplate
+from function_calling_ollama.prompt.prompt_template import DEFAULT_FUNCTION_CALL_PROMPT_TEMPLATE
 
 import requests
 
@@ -24,13 +26,21 @@ class LocalModel:
     def __init__(self,config:LocalModelConfig) -> None:
         self._config:LocalModelConfig = config
         self.endpoint = self._config.endpoint
+        
+        self.tools = []
+
         if not self.endpoint.startswith(("http://", "https://")):
             raise ValueError(f"Provided OPENAI_API_BASE value ({self.endpoint}) must begin with http:// or https://")
 
     def query(self,prompt:str,format="txt"):
+        if self.tools:
+            prompt_template = FunctionCallingPromptTemplate.from_template(DEFAULT_FUNCTION_CALL_PROMPT_TEMPLATE)
+            query_prompt = prompt_template.format(tools=self.tools,prompt=prompt)
+        else:
+            query_prompt = prompt
         payload = {
             "model":self._config.modelname,
-            "prompt":prompt,
+            "prompt":query_prompt.strip(),
             "stream":False,
             "options":{
                 "num_ctx":self._config.context_window
@@ -49,9 +59,10 @@ class LocalModel:
             print(response.status_code)
             if response.status_code == 200:
                 result_full = response.json()
-                console.print(f"JSON API response:\n{result_full}")
+                # console.print(f"JSON API response:\n{result_full}")
+                console.print(type(result_full['response']))
                 result = result_full["response"]
-                print(result)
+                return result
 
             else:
                 Exception(
@@ -61,6 +72,10 @@ class LocalModel:
         except:
             print("some error")
             raise 
+    
+    def bind_tools(self,tools:List[Any]):
+        pass
+    
     def chat(self,messages:List[Message]):
         request = {
             "model":self._config.model_name,

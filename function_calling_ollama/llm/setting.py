@@ -1,5 +1,3 @@
-
-
 from typing import Dict
 from function_calling_ollama.utils import printd
 
